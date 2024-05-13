@@ -3,6 +3,7 @@
 import axios from "axios";
 import Image from "next/image";
 import { useState, useEffect, useRef, KeyboardEvent } from "react";
+import LoadingComponent from "./Loading";
 
 type Product = {
   id: number;
@@ -12,7 +13,7 @@ type Product = {
 
 const ProductGrid = () => {
   const [products, setProducts] = useState<Product[][]>([]);
-
+  const [loading, setLoading] = useState(false);
   const [selectedCell, setSelectedCell] = useState<{
     row: number;
     col: number;
@@ -25,7 +26,9 @@ const ProductGrid = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setLoading(true);
         const response = await axios.get("https://fakestoreapi.com/products");
+        setLoading(false);
         const fetchedProducts: Product[] = response.data.map((item: any) => ({
           id: item.id,
           title: item.title,
@@ -38,6 +41,7 @@ const ProductGrid = () => {
         }
         setProducts(groupedProducts);
       } catch (error) {
+        setLoading(false);
         console.error("Error fetching products:", error);
       }
     };
@@ -84,78 +88,84 @@ const ProductGrid = () => {
   };
 
   return (
-    <div>
-      <table
-        ref={tableRef}
-        tabIndex={0}
-        onKeyDown={handleKeyDown}
-        style={{
-          borderCollapse: "collapse",
-          borderSpacing: "0",
-          width: "100%",
-          height: "auto",
-          outline: "none",
-        }}
-      >
-        <tbody>
-          {products.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              {row.map((_, colIndex) => (
-                <td
-                  key={colIndex}
-                  onClick={() => handleCellClick(rowIndex, colIndex)}
-                  style={{
-                    width: "20%",
-                    height: "200px",
-                    backgroundColor:
-                      selectedCell?.row === rowIndex &&
-                      selectedCell?.col === colIndex
-                        ? "white"
-                        : "black", // Cell color based on whether it's the selected cell or not
-                    color: "black",
-                    cursor: "pointer",
-                    border: "1px solid #ccc",
-                    textAlign: "center",
-                    position: "relative",
-                  }}
-                >
-                  {selectedCell?.row === rowIndex &&
-                    selectedCell?.col === colIndex && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: "50%",
-                          left: "50%",
-                          transform: "translate(-50%, -50%)",
-                          width: "90%",
-                          height: "90%",
-                          padding: "10px",
-                          boxSizing: "border-box",
-                          overflow: "auto",
-                        }}
-                      >
-                        <h2 className="line-clamp-1 capitalize">
-                          {products[rowIndex][colIndex].title}
-                        </h2>
-                        <Image
-                          src={products[rowIndex][colIndex].image}
-                          alt={products[rowIndex][colIndex].title}
-                          style={{
-                            margin: "0 auto",
-                            display: "block",
-                          }}
-                          height={100}
-                          width={100}
-                        />
-                      </div>
-                    )}
-                </td>
+    <>
+      {loading ? (
+        <LoadingComponent loading={loading} />
+      ) : (
+        <div>
+          <table
+            ref={tableRef}
+            tabIndex={0}
+            onKeyDown={handleKeyDown}
+            style={{
+              borderCollapse: "collapse",
+              borderSpacing: "0",
+              width: "100%",
+              height: "auto",
+              outline: "none",
+            }}
+          >
+            <tbody>
+              {products.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {row.map((_, colIndex) => (
+                    <td
+                      key={colIndex}
+                      onClick={() => handleCellClick(rowIndex, colIndex)}
+                      style={{
+                        width: "20%",
+                        height: "200px",
+                        backgroundColor:
+                          selectedCell?.row === rowIndex &&
+                          selectedCell?.col === colIndex
+                            ? "white"
+                            : "black", // Cell color based on whether it's the selected cell or not
+                        color: "black",
+                        cursor: "pointer",
+                        border: "1px solid #ccc",
+                        textAlign: "center",
+                        position: "relative",
+                      }}
+                    >
+                      {selectedCell?.row === rowIndex &&
+                        selectedCell?.col === colIndex && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "50%",
+                              left: "50%",
+                              transform: "translate(-50%, -50%)",
+                              width: "90%",
+                              height: "90%",
+                              padding: "10px",
+                              boxSizing: "border-box",
+                              overflow: "auto",
+                            }}
+                          >
+                            <h2 className="line-clamp-1 capitalize">
+                              {products[rowIndex][colIndex].title}
+                            </h2>
+                            <Image
+                              src={products[rowIndex][colIndex].image}
+                              alt={products[rowIndex][colIndex].title}
+                              style={{
+                                margin: "0 auto",
+                                display: "block",
+                              }}
+                              height={100}
+                              width={100}
+                            />
+                          </div>
+                        )}
+                    </td>
+                  ))}
+                </tr>
               ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
   );
 };
 
