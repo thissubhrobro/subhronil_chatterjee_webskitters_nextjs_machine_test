@@ -1,11 +1,13 @@
-First Clone this Git repository
+First Clone this Git repository with this command:
+
+    git clone https://github.com/thissubhrobro/subhronil_chatterjee_webskitters_nextjs_machine_test.git
 
 Go to The Directory
 
-To Install Dependencies : npm i
+For Installing Dependencies : npm i
 
 After Completion
 
 In Order to Run the Development Server : npm run dev
 
-Open [http://localhost:3000](http://localhost:3000) to see the result.
+Open http://localhost:3000 to see the result.
